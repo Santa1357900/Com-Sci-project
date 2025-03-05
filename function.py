@@ -48,9 +48,8 @@ def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperatu
 
 
 # ฟังก์ชันสำหรับจำลองไฟในป่าผ่านหลาย ๆ ขั้นตอน
-def simulate_fire(grid_size, moisture, iterations, wind_direction="N", wind_strength=1.0, temperature=30):
+def simulate_fire(grid_size, moisture, steps, wind_direction="N", wind_strength=1.0, temperature=30):
     moisture_level = moisture / 100  # แปลงค่าความชื้นเป็นค่าระหว่าง 0 ถึง 1
-    steps = iterations
     
     forest = np.ones((grid_size, grid_size))  # สร้างป่าด้วยเซลล์ที่ยังไม่ถูกไฟไหม้ทั้งหมด (ค่า 1)
     
@@ -88,4 +87,4 @@ def get_fire_stats(unburned_list, burning_list, ash_list):
 # เรียกใช้งาน
 results, unburned_list, burning_list, ash_list = simulate_fire(30, 40, 30, 'W', 1, 45)
 
-unburned_list
+ash_list
