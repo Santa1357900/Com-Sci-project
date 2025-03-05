@@ -39,10 +39,10 @@ def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperatu
     burning = np.argwhere(new_forest == 2)
     ash = np.argwhere(new_forest == 3)
 
-    # เพิ่มสถานะปัจจุบันของแต่ละประเภทลงในรายการ
-    unburned_list.append(unburned)
-    burning_list.append(burning)
-    ash_list.append(ash)
+    # เพิ่มสถานะปัจจุบันของแต่ละประเภทลงในรายการ โดยเพิ่มข้อมูลรอบที่
+    unburned_list.append((step, unburned))
+    burning_list.append((step, burning))
+    ash_list.append((step, ash))
 
     return new_forest
 
@@ -78,8 +78,14 @@ def simulate_fire(grid_size, moisture, iterations, wind_direction="N", wind_stre
 def get_fire_stats(unburned_list, burning_list, ash_list):
     num_steps = len(unburned_list)  # จำนวนขั้นตอนในการจำลอง
     # นับจำนวนเซลล์ในแต่ละประเภทในแต่ละขั้นตอน
-    unburned_counts = [len(unburned) for unburned in unburned_list]
-    burning_counts = [len(burning) for burning in burning_list]
-    ash_counts = [len(ash) for ash in ash_list]
+    unburned_counts = [len(unburned[1]) for unburned in unburned_list]  # ใช้ข้อมูลใน index 1 ของ tuple
+    burning_counts = [len(burning[1]) for burning in burning_list]
+    ash_counts = [len(ash[1]) for ash in ash_list]
     
     return unburned_counts, burning_counts, ash_counts
+
+
+# เรียกใช้งาน
+results, unburned_list, burning_list, ash_list = simulate_fire(30, 40, 30, 'W', 1, 45)
+
+unburned_list
