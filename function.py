@@ -87,9 +87,17 @@ def simulate_fire(grid_size, moisture, steps, wind_direction="N", wind_strength=
     
     return results, unburned_list, burning_list, ash_list  # คืนค่าผลลัพธ์และข้อมูลสถิติ
 
+def get_fire_stats(unburned_list, burning_list, ash_list):
+    num_steps = len(unburned_list)
+    # นับจำนวนเซลล์ที่ยังไม่ลุกไหม้, กำลังลุกไหม้, และเป็นขี้เถ้า
+    unburned_counts = [len(unburned[1]) for unburned in unburned_list]
+    burning_counts = [len(burning[1]) for burning in burning_list]
+    ash_counts = [len(ash[1]) for ash in ash_list]
+    
+    return unburned_counts, burning_counts, ash_counts  # คืนค่าสถิติ
+
 
 # เรียกใช้งาน โดยกำหนดจุดเริ่มต้นของไฟหลายจุด
 fire_start_positions = [(5, 5), (15, 15), (25, 25)]  # กำหนดหลายจุดเริ่มต้น
 results, unburned_list, burning_list, ash_list = simulate_fire(30, 40, 30, 'W', 1, 45, fire_starts=fire_start_positions)
-
-ash_list
+unburned_counts, burning_counts, ash_counts =  get_fire_stats(unburned_list, burning_list, ash_list)
