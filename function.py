@@ -1,10 +1,11 @@
 import numpy as np
 import random
 
-# ฟังก์ชันสำหรับจำลองการแพร่กระจายของไฟ
+# ฟังก์ชันสำหรับจำลองการแพร่กระจายของไฟ (ใช้ Monte Carlo)
 def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperature, step, unburned_list, burning_list, ash_list):
     grid_size = forest.shape[0]  # กำหนดขนาดของตารางป่า
     new_forest = forest.copy()  # คัดลอกตารางป่าเพื่อแก้ไข
+    trials = 100
 
     # กำหนดค่า bias ของลมในแต่ละทิศทาง
     wind_bias = {
@@ -30,7 +31,15 @@ def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperatu
                             # เพิ่มโอกาสตามทิศทางและความแรงของลม
                             if wind_direction in wind_bias and (di, dj) in wind_bias[wind_direction]:
                                 spread_chance *= wind_bias[wind_direction][(di, dj)] * wind_strength
-                            if random.random() < spread_chance:  # สุ่มดูว่าจะลุกลามหรือไม่
+                            
+                            # ใช้ Monte Carlo เพื่อสุ่มหลายครั้งและหาค่าเฉลี่ย
+                            success_count = 0
+                            for _ in range(trials):
+                                if random.random() < spread_chance:  # สุ่มดูว่าจะลุกลามหรือไม่
+                                    success_count += 1
+                            
+                            # ถ้าเฉลี่ยผลลัพธ์สำเร็จมากกว่าครึ่งหนึ่ง ให้ถือว่าไฟลุกลาม
+                            if success_count / trials > 0.5:
                                 new_forest[ni, nj] = 2  # ลุกลามไปเซลล์นั้น
                 new_forest[i, j] = 3  # เซลล์ที่ลุกไหม้จะกลายเป็นขี้เถ้า (ค่า 3)
 
@@ -77,17 +86,6 @@ def simulate_fire(grid_size, moisture, steps, wind_direction="N", wind_strength=
         results[t] = forest.copy()
     
     return results, unburned_list, burning_list, ash_list  # คืนค่าผลลัพธ์และข้อมูลสถิติ
-
-
-# ฟังก์ชันเพื่อดึงข้อมูลสถิติจากการจำลองไฟ
-def get_fire_stats(unburned_list, burning_list, ash_list):
-    num_steps = len(unburned_list)
-    # นับจำนวนเซลล์ที่ยังไม่ลุกไหม้, กำลังลุกไหม้, และเป็นขี้เถ้า
-    unburned_counts = [len(unburned[1]) for unburned in unburned_list]
-    burning_counts = [len(burning[1]) for burning in burning_list]
-    ash_counts = [len(ash[1]) for ash in ash_list]
-    
-    return unburned_counts, burning_counts, ash_counts  # คืนค่าสถิติ
 
 
 # เรียกใช้งาน โดยกำหนดจุดเริ่มต้นของไฟหลายจุด
