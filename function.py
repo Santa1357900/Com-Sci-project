@@ -7,14 +7,15 @@ def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperatu
     new_forest = forest.copy()  # คัดลอกตารางป่าเพื่อแก้ไข
     trials = 100
 
-    # กำหนดค่า bias ของลมในแต่ละทิศทาง
+   # กำหนดค่า bias ของลมในแต่ละทิศทาง (อัปเดตใหม่)
     wind_bias = {
-        "N": {(-1, 0): 1.5, (-1, -1): 1.3, (-1, 1): 1.3, (1, 0): 0.3, (1, -1): 0.5, (1, 1): 0.5},
-        "S": {(1, 0): 1.5, (1, -1): 1.3, (1, 1): 1.3, (-1, 0): 0.3, (-1, -1): 0.5, (-1, 1): 0.5},
-        "E": {(0, 1): 1.5, (-1, 1): 1.3, (1, 1): 1.3, (0, -1): 0.3, (-1, -1): 0.5, (1, -1): 0.5},
-        "W": {(0, -1): 1.5, (-1, -1): 1.3, (1, -1): 1.3, (0, 1): 0.3, (-1, 1): 0.5, (1, 1): 0.5}
+    "N": {(-1, 0): 1, (-1, -1): 0.6, (-1, 1): 0.6, (1, 0): 0.2, (1, -1): 0.25, (1, 1): 0.25},
+    "S": {(1, 0): 1, (1, -1): 0.6, (1, 1): 0.6, (-1, 0): 0.2, (-1, -1): 0.25, (-1, 1): 0.25},
+    "E": {(0, 1): 1, (-1, 1): 0.6, (1, 1): 0.6, (0, -1): 0.2, (-1, -1): 0.25, (1, -1): 0.25},
+    "W": {(0, -1): 1, (-1, -1): 0.6, (1, -1): 0.6, (0, 1): 0.2, (-1, 1): 0.25, (1, 1): 0.25}
     }
-    
+
+
     # ปัจจัยจากอุณหภูมิที่มีผลต่อการลุกลามของไฟ
     temperature_factor = 0.1 * (temperature - 10) / 10
 
@@ -30,7 +31,8 @@ def spread_fire(forest, moisture_level, wind_direction, wind_strength, temperatu
                             spread_chance = (1.0 - moisture_level) + temperature_factor  # โอกาสในการลุกลาม
                             # เพิ่มโอกาสตามทิศทางและความแรงของลม
                             if wind_direction in wind_bias and (di, dj) in wind_bias[wind_direction]:
-                                spread_chance *= wind_bias[wind_direction][(di, dj)] * wind_strength
+                                  spread_chance *= 1 + (wind_bias[wind_direction][(di, dj)] - 1) * wind_strength
+
                             
                             # ใช้ Monte Carlo เพื่อสุ่มหลายครั้งและหาค่าเฉลี่ย
                             success_count = 0
@@ -95,7 +97,6 @@ def get_fire_stats(unburned_list, burning_list, ash_list):
     ash_counts = [len(ash[1]) for ash in ash_list]
     
     return unburned_counts, burning_counts, ash_counts  # คืนค่าสถิติ
-
 
 # เรียกใช้งาน โดยกำหนดจุดเริ่มต้นของไฟหลายจุด
 fire_start_positions = [(5, 5), (15, 15), (25, 25)]  # กำหนดหลายจุดเริ่มต้น
